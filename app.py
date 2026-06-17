@@ -23,6 +23,25 @@ modulo = st.sidebar.selectbox(
     ]
 )
 
+modulos_con_estado = [
+    "Redacción Policial",
+    "Redacción Policial con Audio"
+]
+
+estado_caso = ""
+
+if modulo in modulos_con_estado:
+
+    estado_caso = st.selectbox(
+        "Estado del caso",
+        [
+            "",
+            "ABIERTO",
+            "EN_CURSO",
+            "CERRADO"
+        ]
+    )
+
 # =========================
 # INPUT SEGÚN MÓDULO
 # =========================
@@ -68,6 +87,15 @@ if st.button("Ejecutar"):
         st.error("Módulo no válido")
         st.stop()
 
+    if (
+        modulo in modulos_con_estado
+        and not estado_caso
+    ):
+        st.warning(
+            "Seleccione el estado del caso."
+        )
+        st.stop()
+
     with st.spinner("Procesando..."):
 
         try:
@@ -89,6 +117,9 @@ if st.button("Ejecutar"):
                             audio_file,
                             audio_file.type
                         )
+                    },
+                    data={
+                        "estado_caso": estado_caso
                     }
                 )
 
@@ -104,7 +135,8 @@ if st.button("Ejecutar"):
                 response = requests.post(
                     f"{API_URL}/{endpoint}",
                     json={
-                        "texto": prompt
+                        "texto": prompt,
+                         "estado_caso": estado_caso
                     }
                 )
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Form
 import tempfile
 import os
 
@@ -10,7 +10,8 @@ router = APIRouter()
 
 @router.post("/redaccion-policial-audio")
 async def redaccion_policial_audio(
-    archivo: UploadFile = File(...)
+    archivo: UploadFile = File(...),
+    estado_caso: str = Form(...)
 ):
 
     with tempfile.NamedTemporaryFile(
@@ -30,10 +31,12 @@ async def redaccion_policial_audio(
         )
 
         informe = redactar_reporte(
-            texto
+            solicitud=texto,
+            estado_caso=estado_caso
         )
 
         return {
+            "estado_caso": estado_caso,
             "transcripcion": texto,
             "resultado": informe
         }

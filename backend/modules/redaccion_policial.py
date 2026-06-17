@@ -1,9 +1,11 @@
 from backend.rag.hybrid_search import hybrid_search
 from backend.rag.llm import responder
+from backend.core.historico_repository import guardar_reporte
 
 
 def redactar_reporte(
-    solicitud: str
+    solicitud: str,
+    estado_caso: str
 ) -> str:
     """
     Genera redacción policial basada en la narrativa del usuario.
@@ -30,6 +32,10 @@ NARRATIVA DEL CASO (FUENTE OFICIAL):
 CONTEXTO RECUPERADO (SOLO REFERENCIA LEGAL Y DOCUMENTAL):
 
 {contexto_unido if contexto_unido else "No hay contexto relacionado disponible."}
+
+ESTADO DEL CASO:
+
+{estado_caso}
 
 TAREA:
 
@@ -97,6 +103,23 @@ No inventes información.
 No utilices datos de otros casos.
 """
 
-    return responder(
+    reporte = responder(
         prompt
     )
+
+    try:
+
+        guardar_reporte(
+            modulo="Redacción Policial",
+            narrativa=solicitud,
+            reporte=reporte,
+            estado_caso=estado_caso
+        )
+
+    except Exception as e:
+
+        print(
+            f"Error guardando histórico: {e}"
+        )
+
+    return reporte
